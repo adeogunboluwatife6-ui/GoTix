@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6fa">
+    <meta name="description" content="Manage your events, ticket sales, and attendees in one place.">
+    <title>Gather — Organizer dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="auth-screen" id="auth-screen">
+      <div class="auth-card">
+        <a class="brand auth-brand" href="#" aria-label="Gather home"><span class="brand-mark">g</span><span>gather<span class="brand-period">.</span></span></a>
+        <span class="eyebrow">ORGANIZER PORTAL</span>
+        <h1 id="auth-heading">Welcome back</h1>
+        <p class="muted" id="auth-description">Sign in to manage your events and tickets.</p>
+        <form id="auth-form">
+          <label class="field-label" for="auth-email">Email address</label>
+          <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <label class="field-label" for="auth-password">Password</label>
+          <input id="auth-password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required>
+          <label class="field-label signup-only" for="auth-name">Organizer name</label>
+          <input class="signup-only" id="auth-name" type="text" autocomplete="organization" placeholder="Your organization">
+          <button class="button button-primary auth-submit" id="auth-submit" type="submit">Sign in</button>
+        </form>
+        <p class="auth-switch"><span id="auth-switch-copy">New to Gather?</span> <button type="button" class="text-button" id="auth-switch">Create an account</button></p>
+        <p class="auth-note">Your dashboard data is stored securely in your Supabase project.</p>
+        <a class="auth-browse" href="public.html">Explore public events <span>→</span></a>
+      </div>
+    </div>
+
+    <div class="app-shell hidden" id="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#" aria-label="Gather dashboard"><span class="brand-mark">g</span><span>gather<span class="brand-period">.</span></span></a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
+          <button class="nav-item" data-view="events"><span class="nav-icon">▦</span> My events</button>
+          <button class="nav-item" data-view="tickets"><span class="nav-icon">▤</span> Tickets</button>
+          <button class="nav-item" data-view="attendees"><span class="nav-icon">♧</span> Attendees</button>
+          <button class="nav-item" data-view="orders"><span class="nav-icon">↗</span> Orders</button>
+          <div class="nav-divider"></div>
+          <div class="workspace-label">MANAGE</div>
+          <button class="nav-item" data-view="finance"><span class="nav-icon">₦</span> Finance</button>
+          <button class="nav-item" data-view="analytics"><span class="nav-icon">▥</span> Analytics</button>
+          <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Settings</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="help-card">
+            <span class="help-icon">✳</span>
+            <strong>Here to help</strong>
+            <p>Questions about your events? We’re one message away.</p>
+            <a href="mailto:support@gather.example">Contact support <span>↗</span></a>
+          </div>
+          <button class="profile-button" id="profile-button" type="button" aria-label="Sign out">
+            <span class="avatar" id="user-avatar">O</span>
+            <span class="profile-copy"><strong id="user-name">Organizer</strong><small id="user-email"></small></span>
+            <span class="profile-menu">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button type="button" class="mobile-menu" id="mobile-menu" aria-label="Open navigation">☰</button>
+          <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Overview</strong></div>
+          <div class="topbar-actions">
+            <span class="connection-status"><span class="status-dot"></span><span id="connection-label">Connecting</span></span>
+            <button class="icon-button" type="button" aria-label="Notifications" title="Notifications">♧<i></i></button>
+            <span class="avatar top-avatar" id="top-avatar">O</span>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow" id="today-label">YOUR EVENT BUSINESS</p>
+              <h1 id="page-title">Good morning<span class="heading-period">.</span></h1>
+              <p class="muted" id="page-subtitle">Here’s what’s happening with your events today.</p>
+            </div>
+            <button class="button button-primary" type="button" id="create-event-button"><span class="button-plus">+</span> Create event</button>
+          </section>
+
+          <div class="notice hidden" id="notice" role="status"></div>
+          <div class="loading-bar hidden" id="loading-bar"><span></span></div>
+
+          <section id="overview-view" class="view-panel">
+            <div class="stats-grid">
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Total events</span><span class="stat-icon icon-lilac">▦</span></div>
+                <div class="stat-value" id="stat-events">—</div>
+                <div class="stat-foot"><span id="stat-event-detail">Your events</span><span class="stat-foot-icon">↗</span></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Tickets sold</span><span class="stat-icon icon-blue">▤</span></div>
+                <div class="stat-value" id="stat-tickets">—</div>
+                <div class="stat-foot"><span>Across your events</span><span class="stat-foot-icon">↗</span></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Gross revenue</span><span class="stat-icon icon-green">₦</span></div>
+                <div class="stat-value" id="stat-revenue">—</div>
+                <div class="stat-foot"><span>Verified payments only</span><span class="stat-foot-icon">↗</span></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Attendees</span><span class="stat-icon icon-peach">♧</span></div>
+                <div class="stat-value" id="stat-attendees">—</div>
+                <div class="stat-foot"><span>Tickets issued</span><span class="stat-foot-icon">↗</span></div>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="panel chart-panel">
+                <div class="panel-heading">
+                  <div><h2>Sales overview</h2><p class="panel-subtitle">Your verified ticket revenue</p></div>
+                  <label class="select-wrap"><span class="sr-only">Sales time range</span><select id="sales-range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select><span class="select-chevron">⌄</span></label>
+                </div>
+                <div class="chart-summary"><span class="chart-total" id="chart-total">₦0</span><span class="chart-caption">in selected period</span></div>
+                <div class="chart-wrap"><canvas id="sales-chart" aria-label="Ticket sales revenue chart"></canvas><div class="empty-chart hidden" id="empty-chart">Your sales will appear here after a verified ticket purchase.</div></div>
+                <div class="chart-legend"><span class="legend-dot"></span> Verified ticket revenue</div>
+              </section>
+              <section class="panel event-panel">
+                <div class="panel-heading">
+                  <div><h2>Upcoming events</h2><p class="panel-subtitle">What’s next on your calendar</p></div>
+                  <button class="link-button" type="button" data-open-view="events">View all <span>→</span></button>
+                </div>
+                <div id="upcoming-events" class="upcoming-list"></div>
+              </section>
+            </div>
+
+            <section class="panel activity-panel">
+              <div class="panel-heading">
+                <div><h2>Recent orders</h2><p class="panel-subtitle">Latest orders for your events</p></div>
+                <button class="link-button" type="button" data-open-view="orders">View orders <span>→</span></button>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead><tr><th>ORDER</th><th>EVENT</th><th>DATE</th><th>AMOUNT</th><th>STATUS</th></tr></thead>
+                  <tbody id="recent-orders"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <section id="events-view" class="view-panel hidden">
+            <div class="section-toolbar">
+              <div><h2>Your events</h2><p class="panel-subtitle">Create and keep track of your events.</p></div>
+              <button class="button button-primary" type="button" data-create-event><span class="button-plus">+</span> Create event</button>
+            </div>
+            <div class="panel event-table-panel"><div class="table-scroll"><table><thead><tr><th>EVENT</th><th>DATE</th><th>VENUE</th><th>TICKETS</th><th>STATUS</th></tr></thead><tbody id="events-table"></tbody></table></div></div>
+          </section>
+
+          <section id="tickets-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Ticket sales</h2><p class="panel-subtitle">Ticket inventory and sales across your events.</p></div></div><div class="panel event-table-panel"><div class="table-scroll"><table><thead><tr><th>TICKET HOLDER</th><th>EVENT</th><th>TICKET ID</th><th>TYPE</th><th>CHECK-IN</th></tr></thead><tbody id="tickets-table"></tbody></table></div></div></section>
+          <section id="attendees-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Attendees</h2><p class="panel-subtitle">People attending your events.</p></div></div><div class="panel event-table-panel"><div class="table-scroll"><table><thead><tr><th>ATTENDEE</th><th>EVENT</th><th>EMAIL</th><th>TICKET</th><th>CHECK-IN</th></tr></thead><tbody id="attendees-table"></tbody></table></div></div></section>
+          <section id="orders-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Orders</h2><p class="panel-subtitle">Recent payment activity for your events.</p></div></div><div class="panel event-table-panel"><div class="table-scroll"><table><thead><tr><th>ORDER</th><th>EVENT</th><th>DATE</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody id="orders-table"></tbody></table></div></div></section>
+          <section id="finance-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Finance</h2><p class="panel-subtitle">A clear view of verified ticket revenue.</p></div></div><div class="stats-grid finance-stats"><article class="stat-card"><div class="stat-top"><span class="stat-label">Gross revenue</span><span class="stat-icon icon-green">₦</span></div><div class="stat-value" id="finance-revenue">—</div><div class="stat-foot"><span>From verified payments</span></div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Paid orders</span><span class="stat-icon icon-blue">↗</span></div><div class="stat-value" id="finance-orders">—</div><div class="stat-foot"><span>Across your events</span></div></article></div><div class="panel finance-note"><span class="stat-icon icon-lilac">i</span><div><strong>Secure payment processing</strong><p>Payment verification and payouts should be handled by a trusted server or Supabase Edge Function. Secret payment keys must never be added to this website.</p></div></div></section>
+          <section id="analytics-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Analytics</h2><p class="panel-subtitle">Your ticket revenue over time.</p></div></div><div class="panel chart-panel analytics-chart"><div class="panel-heading"><div><h2>Sales overview</h2><p class="panel-subtitle">Verified ticket revenue</p></div></div><div class="chart-summary"><span class="chart-total" id="analytics-chart-total">₦0</span><span class="chart-caption">in selected period</span></div><div class="chart-wrap"><canvas id="analytics-chart" aria-label="Ticket sales revenue chart"></canvas><div class="empty-chart hidden" id="analytics-empty-chart">Your sales will appear here after a verified ticket purchase.</div></div><div class="chart-legend"><span class="legend-dot"></span> Verified ticket revenue</div></div></section>
+          <section id="settings-view" class="view-panel hidden"><div class="section-toolbar"><div><h2>Settings</h2><p class="panel-subtitle">Your organizer account details.</p></div></div><div class="panel settings-panel"><div class="settings-row"><div><strong>Organizer account</strong><p>Your account is protected by Supabase authentication.</p></div><button type="button" class="button button-secondary" id="settings-signout">Sign out</button></div><div class="settings-row"><div><strong>Account email</strong><p id="settings-email">—</p></div></div><div class="settings-row"><div><strong>Organizer name</strong><p id="settings-name">—</p></div></div></div></section>
+          <div class="page-footer">Made for bringing people together <span>♥</span></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="event-modal" role="presentation">
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-heading"><div><span class="eyebrow">YOUR NEXT BIG THING</span><h2 id="modal-title">Create an event</h2><p class="muted">Add event, venue, organizer, and registration details.</p></div><button class="modal-close" type="button" id="close-modal" aria-label="Close">×</button></div>
+        <form id="event-form">
+          <label class="field-label" for="event-title">Event name <span class="required">*</span></label>
+          <input id="event-title" name="title" maxlength="120" placeholder="e.g. Lagos Creative Summit" required>
+          <div class="form-grid">
+            <div><label class="field-label" for="event-category">Category</label><select id="event-category" name="category"><option value="music">Music</option><option value="business">Business</option><option value="education">Education</option><option value="sports">Sports</option><option value="comedy">Comedy</option><option value="religious">Religious</option><option value="arts">Arts & culture</option><option value="other">Other</option></select></div>
+            <div><label class="field-label" for="event-format">Format</label><select id="event-format" name="format"><option value="in_person">In person</option><option value="online">Online</option><option value="hybrid">Hybrid</option></select></div>
+          </div>
+          <label class="field-label" for="event-description">Description</label>
+          <textarea id="event-description" name="description" rows="3" maxlength="5000" placeholder="What should people know about your event?"></textarea>
+          <label class="field-label" for="event-banner">Cover image URL</label>
+          <input id="event-banner" name="banner_url" type="url" maxlength="1000" placeholder="https://example.com/event-cover.jpg">
+          <label class="field-label" for="event-venue">Venue or online location</label>
+          <input id="event-venue" name="venue" maxlength="200" placeholder="e.g. Landmark Centre, Lagos">
+          <div class="form-grid">
+            <div><label class="field-label" for="event-start">Starts <span class="required">*</span></label><input id="event-start" name="starts_at" type="datetime-local" required></div>
+            <div><label class="field-label" for="event-end">Ends <span class="required">*</span></label><input id="event-end" name="ends_at" type="datetime-local" required></div>
+          </div>
+          <div class="form-grid">
+            <div><label class="field-label" for="event-capacity">Attendee capacity</label><input id="event-capacity" name="capacity" type="number" min="1" step="1" placeholder="Leave blank for unlimited"></div>
+            <div><label class="field-label" for="event-deadline">Registration deadline</label><input id="event-deadline" name="registration_deadline" type="datetime-local"></div>
+          </div>
+          <div class="form-grid">
+            <div><label class="field-label" for="event-visibility">Who can see this event?</label><select id="event-visibility" name="visibility"><option value="public">Public — show on event page</option><option value="private">Private — organizer only</option></select></div>
+            <div><label class="field-label" for="event-organizer-name">Organizer name <span class="required">*</span></label><input id="event-organizer-name" name="organizer_name" maxlength="120" required></div>
+          </div>
+          <div class="form-grid">
+            <div><label class="field-label" for="event-contact-email">Contact email <span class="required">*</span></label><input id="event-contact-email" name="contact_email" type="email" maxlength="254" required></div>
+            <div><label class="field-label" for="event-contact-phone">Contact phone</label><input id="event-contact-phone" name="contact_phone" type="tel" maxlength="32" placeholder="+234 ..."></div>
+          </div>
+          <span class="field-label">Organizer links</span>
+          <div class="form-grid">
+            <div><label class="sr-only" for="event-website">Website URL</label><input id="event-website" name="organizer_website" type="url" maxlength="500" placeholder="Website URL"></div>
+            <div><label class="sr-only" for="event-instagram">Instagram URL</label><input id="event-instagram" name="organizer_instagram" type="url" maxlength="500" placeholder="Instagram URL"></div>
+          </div>
+          <label class="field-label sr-only" for="event-x">X profile URL</label>
+          <input id="event-x" name="organizer_x" type="url" maxlength="500" placeholder="X profile URL">
+          <div class="modal-actions"><button class="button button-secondary" type="button" id="save-draft">Save draft</button><button class="button button-primary" type="submit" id="submit-event">Publish event <span>→</span></button></div>
+          <p class="form-footnote">Publishing makes a public event visible on the event discovery page immediately.</p>
+        </form>
+      </section>
+    </div>
+    <div class="toast hidden" id="toast" role="status"></div>
+  </body>
+</html>

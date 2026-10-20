@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fa">
+    <meta name="description" content="Discover upcoming events and tickets on Gather.">
+    <title>Explore events — Gather</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="public.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="public.js" defer></script>
+  </head>
+  <body>
+    <header class="public-header">
+      <a class="brand" href="public.html" aria-label="Gather events"><span class="brand-mark">g</span><span>gather<span class="brand-period">.</span></span></a>
+      <a class="organizer-link" href="index.html">Organizer sign in <span>→</span></a>
+    </header>
+
+    <main class="public-main">
+      <section class="hero">
+        <span class="eyebrow">GOOD PEOPLE. GREAT PLANS.</span>
+        <h1>Find your next<br><span>favorite moment.</span></h1>
+        <p>Discover events, meet your people, and make memories worth keeping.</p>
+      </section>
+
+      <section class="events-section" aria-labelledby="events-heading">
+        <div class="section-heading">
+          <div><span class="eyebrow">MADE FOR GETTING TOGETHER</span><h2 id="events-heading">Upcoming events</h2></div>
+          <span class="event-count" id="event-count"></span>
+        </div>
+        <div class="notice hidden" id="notice" role="status"></div>
+        <div class="events-grid" id="events-list" aria-live="polite"></div>
+        <div class="empty-state hidden" id="empty-state"><span class="empty-icon">✳</span><h3>No events just yet</h3><p>Check back soon to discover what’s happening.</p></div>
+      </section>
+
+      <section class="payment-note">
+        <span class="note-icon">i</span>
+        <p><strong>Payment link information</strong><br>This Monnify link is shared across events. It does not send your selected ticket or price to Monnify, confirm payment to Gather, reserve a ticket, or issue a ticket. Check the amount on Monnify and with the organizer before paying.</p>
+      </section>
+    </main>
+    <footer class="public-footer"><span>gather<span class="brand-period">.</span></span> Bringing people together.</footer>
+  </body>
+</html>
