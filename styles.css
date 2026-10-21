@@ -56,7 +56,7 @@ button { cursor: pointer; }
 .icon-button i { position: absolute; top: 6px; right: 7px; width: 5px; height: 5px; border: 1px solid white; border-radius: 50%; background: #f18b75; }
 .top-avatar { width: 30px; height: 30px; }
 .mobile-menu { display: none; border: 0; background: transparent; color: var(--ink); font-size: 20px; }
-.page-content { max-width: 1440px; margin: 0 auto; padding: 34px 40px 24px; }
+.page-content { width: 100%; min-width: 0; max-width: 1440px; margin: 0 auto; padding: 34px 40px 24px; }
 .page-heading { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; }
 .eyebrow { color: #a0a2af; font-size: 9px; font-weight: 700; letter-spacing: 1.15px; }
 h1, h2, p { margin-top: 0; }
@@ -75,6 +75,7 @@ h1, h2, p { margin-top: 0; }
 .loading-bar span { display: block; width: 35%; height: 100%; background: var(--purple); animation: load 1.1s ease-in-out infinite; }
 @keyframes load { from { transform: translateX(-110%); } to { transform: translateX(300%); } }
 .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.stats-grid > *, .dashboard-grid > * { min-width: 0; }
 .stat-card, .panel { background: var(--surface); border: 1px solid #ececf1; border-radius: 9px; box-shadow: var(--shadow); }
 .stat-card { min-height: 129px; padding: 15px 16px 11px; }
 .stat-top { display: flex; align-items: center; justify-content: space-between; }
@@ -120,7 +121,7 @@ h1, h2, p { margin-top: 0; }
 .empty-state { padding: 24px 10px; color: #9b9dab; font-size: 10px; line-height: 1.6; text-align: center; }
 .activity-panel { padding-bottom: 5px; }
 .activity-panel .panel-heading { margin-bottom: 14px; }
-.table-scroll { overflow-x: auto; }
+.table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
 table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
 thead { background: #f8f8fa; }
 th { padding: 10px 12px; color: #9698a6; font-size: 8px; font-weight: 700; letter-spacing: .65px; }
@@ -190,13 +191,17 @@ input:focus, textarea:focus, select:focus { border-color: #a49af2 !important; bo
   .topbar { padding-right: 25px; padding-left: 25px; }
   .stats-grid { gap: 10px; }
   .stat-card { padding-right: 12px; padding-left: 12px; }
-  .dashboard-grid { grid-template-columns: minmax(0, 1.35fr) minmax(240px, .9fr); gap: 11px; }
+  .dashboard-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, .9fr); gap: 11px; }
+}
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
-  .sidebar { width: 248px; transform: translateX(-105%); transition: transform .2s; box-shadow: 10px 0 35px #20203312; }
+  .sidebar { width: 248px; overflow-y: auto; transform: translateX(-105%); transition: transform .2s; box-shadow: 10px 0 35px #20203312; }
   .sidebar.open { transform: translateX(0); }
   .main-content { margin-left: 0; }
-  .mobile-menu { display: inline-grid; place-items: center; }
+  .mobile-menu { width: 40px; height: 40px; display: inline-grid; flex: 0 0 auto; place-items: center; border-radius: 8px; }
   .topbar { height: 58px; padding: 0 17px; }
   .breadcrumb { margin-right: auto; margin-left: 11px; }
   .topbar-actions { gap: 11px; }
@@ -217,15 +222,18 @@ input:focus, textarea:focus, select:focus { border-color: #a49af2 !important; bo
   .activity-panel table { min-width: 540px; }
 }
 @media (max-width: 430px) {
-  .page-heading { align-items: flex-start; }
+  .page-heading { align-items: flex-start; flex-wrap: wrap; }
+  .page-heading > div { flex: 1 1 200px; min-width: 0; }
   .page-heading .eyebrow { font-size: 8px; }
   .page-heading h1 { font-size: 20px; }
-  .page-heading > .button { margin-top: 12px; }
+  .page-heading > .button { margin-top: 0; }
   .page-heading .muted { max-width: 205px; }
   .stat-card { padding: 12px 11px 9px; }
   .stat-value { font-size: 20px; }
   .stat-label { font-size: 9px; }
   .panel { padding: 15px 13px; }
+  .section-toolbar { align-items: flex-start; flex-wrap: wrap; }
+  .settings-row { align-items: flex-start; flex-direction: column; gap: 8px; padding: 14px 0; }
   .form-grid { grid-template-columns: 1fr; gap: 0; }
   .modal { padding: 19px 17px 17px; }
   .modal-actions { flex-direction: column-reverse; }
